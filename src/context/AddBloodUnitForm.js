@@ -17,18 +17,7 @@ const AddBloodUnitForm = ({ onAdd }) => {
         setExpirationDate(expiry.toISOString().split('T')[0]);
     }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const bbName = sessionStorage.getItem('bbName');
-
-        const bloodUnit = {
-            bloodType,
-            bid,
-            bbName,
-            quantity,
-            expirationDate,
-        };
-
+    const handleSubmit = async (bloodUnit) => { // Change to accept bloodUnit directly
         try {
             const response = await addBloodUnit(bloodUnit);
             if (response.status === 200) {
@@ -60,10 +49,16 @@ const AddBloodUnitForm = ({ onAdd }) => {
                     setQrError(null);
                     setShowQrScanner(false); // Close scanner after successful scan
                     
-                    // Automatically submit the form after 2 seconds
-                    setTimeout(() => {
-                        handleSubmit({ preventDefault: () => {} }); // Call handleSubmit without event
-                    }, 2000);
+                    // Directly call handleSubmit with the new blood unit data
+                    const bbName = sessionStorage.getItem('bbName');
+                    const bloodUnit = {
+                        bloodType: parsedData.bloodType,
+                        bid: parsedData.bid,
+                        bbName,
+                        quantity,
+                        expirationDate,
+                    };
+                    handleSubmit(bloodUnit); // Call handleSubmit with bloodUnit data
                 } else {
                     setQrError("Invalid QR code data");
                 }
@@ -80,7 +75,12 @@ const AddBloodUnitForm = ({ onAdd }) => {
 
     return (
         <div>
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow mb-4">
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                const bbName = sessionStorage.getItem('bbName');
+                const bloodUnit = { bloodType, bid, bbName, quantity, expirationDate };
+                handleSubmit(bloodUnit);
+            }} className="bg-white p-6 rounded shadow mb-4">
                 <h2 className="text-2xl font-semibold mb-4">Add Blood Unit</h2>
                 <div className="mb-4">
                     <label className="block mb-2">Blood Group</label>
