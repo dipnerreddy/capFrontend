@@ -114,7 +114,7 @@ const RequestsForm = () => {
                     </div>
                 </div>
             ) : (
-                <div>No requests found for this blood bank.</div> // Message when no requests
+                <p>No requests available.</p>
             )}
         </div>
     );

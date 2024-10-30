@@ -39,8 +39,8 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        fetchData();
-    }, [bbName]);
+        fetchData(); // Call fetchData here
+    }, [bbName]); // Keep bbName as a dependency
 
     const handleLogout = () => {
         console.log("Logging out...");
