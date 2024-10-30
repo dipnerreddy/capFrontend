@@ -21,15 +21,10 @@ export const getUserRequests = async (bbName) => {
     return await axios.get(`${API_URL}/userController/requests/${bbName}`); // Send bbName as a path parameter
 };
 
-// Updated function to get user requests using GET with query parameter
-// export const getUserRequests = async (bbName) => {
-//     return await axios.get(`${API_URL}/requests`, {
-//         params: { bbName } // Pass bbName as a query parameter
-//     });
-// };
 
-// Updated function to get user requests using GET with request body
-// export const getUserRequests = async (bbName) => {
-//     const requestBody = { bbName }; // Create request body
-//     return await axios.get(`${API_URL}/userController/requests`, { data: requestBody }); // Send the request body
-// };
+export const deleteUserRequest = async (requestId) => {
+    return await axios.delete(`${API_URL}/userController/delete-request`, {
+        data: { id: requestId } // Send the request ID in the request body
+    });
+};
+
