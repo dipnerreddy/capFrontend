@@ -1,4 +1,3 @@
-// src/routes/Dashboard.js
 import React, { useState } from 'react';
 import AddBloodUnitForm from '../context/AddBloodUnitForm';
 import MakePaymentForm from '../context/MakePaymentForm';
@@ -24,9 +23,16 @@ const Dashboard = () => {
         // Update state with fetched data
     };
 
+    const handleLogout = () => {
+        // Logic to handle logout (e.g., clearing session storage, redirecting)
+        console.log("Logging out...");
+        sessionStorage.clear();
+        window.location.href = '/login'; // Adjust the URL to your login page
+    };
+
     return (
         <div className="flex">
-            <aside className="w-64 h-screen bg-gray-800 text-white">
+            <aside className="w-64 h-screen bg-gray-800 text-white fixed">
                 <div className="p-4">
                     <h2 className="text-2xl font-bold">BloodLinks Dashboard</h2>
                     <nav className="mt-4">
@@ -37,8 +43,14 @@ const Dashboard = () => {
                         </ul>
                     </nav>
                 </div>
+                <button 
+                    onClick={handleLogout} 
+                    className="absolute bottom-0 w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 mb-0"
+                >
+                    Logout
+                </button>
             </aside>
-            <main className="flex-1 p-6 bg-gray-200">
+            <main className="flex-1 p-6 bg-gray-200 ml-64">
                 <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
                 
                 {/* Add Blood Unit Form */}
@@ -50,7 +62,6 @@ const Dashboard = () => {
                 {/* Database Info Section */}
                 <div className="bg-white p-6 rounded shadow mt-10">
                     <h2 className="text-2xl font-semibold mb-4">Database Info</h2>
-                    {/* Render database info here */}
                     {databaseInfo.length > 0 ? (
                         <ul>
                             {databaseInfo.map((item, index) => (

@@ -7,6 +7,6 @@ export const addBloodUnit = (bloodUnit) => {
     return axios.post(`${API_URL}/bloodunits/add`, bloodUnit);
 };
 
-export const useUser=(useUser) => {
-    
+export const addPayment = (paymentDetails) => {
+    return axios.post(`${API_URL}/bills/payment`, paymentDetails);
 }
