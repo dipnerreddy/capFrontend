@@ -1,33 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddBloodUnitForm from '../context/AddBloodUnitForm';
 import MakePaymentForm from '../context/MakePaymentForm';
+import CustomPieChart from '../context/PieChart';
+import { getPieChartData } from '../context/api';
 
 const Dashboard = () => {
     const [databaseInfo, setDatabaseInfo] = useState([]);
+    const bbName = sessionStorage.getItem('bbName');
 
     const handleAddBloodUnit = async (bloodUnit) => {
-        // Logic to add blood unit (e.g., POST request to your API)
         console.log("Adding Blood Unit:", bloodUnit);
-        // Fetch updated database info after adding if needed
     };
 
     const handleMakePayment = async (paymentDetails) => {
-        // Logic to make payment (e.g., POST request to your API)
         console.log("Making Payment:", paymentDetails);
-        // Fetch updated database info or show confirmation
     };
 
-    const fetchDatabaseInfo = async () => {
-        // Logic to fetch database information (e.g., GET request to your API)
-        console.log("Fetching Database Info");
-        // Update state with fetched data
+    const fetchData = async () => {
+        if (!bbName) {
+            console.error("Blood bank name is not available in session storage.");
+            return;
+        }
+
+        try {
+            const response = await getPieChartData(bbName); // Pass bbName
+            const data = response.data;
+
+            // Format data for PieChart
+            const formattedData = Object.entries(data).map(([name, value]) => ({
+                name,
+                value,
+            }));
+            setDatabaseInfo(formattedData);
+        } catch (error) {
+            console.error("Error fetching pie chart data:", error);
+        }
     };
+
+    useEffect(() => {
+        fetchData(); // Fetch data on component mount
+    }, [bbName]);
 
     const handleLogout = () => {
-        // Logic to handle logout (e.g., clearing session storage, redirecting)
         console.log("Logging out...");
         sessionStorage.clear();
-        window.location.href = '/login'; // Adjust the URL to your login page
+        window.location.href = '/login';
+    };
+
+    const handleRefresh = () => {
+        fetchData(); // Re-fetch data on refresh button click
     };
 
     return (
@@ -39,7 +60,7 @@ const Dashboard = () => {
                         <ul>
                             <li className="hover:bg-gray-700 p-2 rounded">Add Blood Unit</li>
                             <li className="hover:bg-gray-700 p-2 rounded">Make Payment</li>
-                            <li className="hover:bg-gray-700 p-2 rounded" onClick={fetchDatabaseInfo}>View Database Info</li>
+                            <li className="hover:bg-gray-700 p-2 rounded">View Database Info</li>
                         </ul>
                     </nav>
                 </div>
@@ -52,22 +73,22 @@ const Dashboard = () => {
             </aside>
             <main className="flex-1 p-6 bg-gray-200 ml-64">
                 <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-                
-                {/* Add Blood Unit Form */}
-                <AddBloodUnitForm onAdd={handleAddBloodUnit} />
 
-                {/* Make Payment Section */}
+                <AddBloodUnitForm onAdd={handleAddBloodUnit} />
                 <MakePaymentForm onPay={handleMakePayment} />
 
-                {/* Database Info Section */}
                 <div className="bg-white p-6 rounded shadow mt-10">
                     <h2 className="text-2xl font-semibold mb-4">Database Info</h2>
+                    <button 
+                        onClick={handleRefresh} 
+                        className="mb-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                    >
+                        Refresh
+                    </button>
                     {databaseInfo.length > 0 ? (
-                        <ul>
-                            {databaseInfo.map((item, index) => (
-                                <li key={index} className="border-b py-2">{item}</li>
-                            ))}
-                        </ul>
+                        <div>
+                            <CustomPieChart data={databaseInfo} />
+                        </div>
                     ) : (
                         <p>No data available. Fetch information from the database.</p>
                     )}

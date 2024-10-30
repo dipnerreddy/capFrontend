@@ -10,3 +10,8 @@ export const addBloodUnit = (bloodUnit) => {
 export const addPayment = (paymentDetails) => {
     return axios.post(`${API_URL}/bills/payment`, paymentDetails);
 }
+
+// Updated function to get the pie chart data using GET and bbName
+export const getPieChartData = (bbName) => {
+    return axios.get(`${API_URL}/bloodunits/piechart/${bbName}`);
+};
