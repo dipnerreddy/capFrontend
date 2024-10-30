@@ -1,66 +1,62 @@
-import React, { useState, useEffect } from 'react';
-import { getUserRequests } from '../context/api'; // Make sure to implement this in your api.js
+import React, { useEffect, useState } from 'react';
+import { getUserRequests } from '../context/api'; // Import the API function
 
 const RequestsForm = () => {
     const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const bbName = sessionStorage.getItem('bbName') || ''; // Get the bbName from session storage
 
-    // Fetch user requests on component mount
     useEffect(() => {
         const fetchRequests = async () => {
+            if (!bbName) {
+                setError("Blood bank name is not set."); // Handle case where bbName is not found
+                setLoading(false);
+                return;
+            }
+
             try {
-                const response = await getUserRequests(); // Fetch requests from API
-                setRequests(response.data); // Assuming response.data contains the array of requests
-            } catch (error) {
-                console.error("Error fetching requests:", error);
+                const response = await getUserRequests(bbName); // Use the bbName to fetch requests
+                setRequests(response.data); // Set the requests from the response
+            } catch (err) {
+                console.error("Error fetching requests:", err);
+                setError("Failed to fetch requests. Please try again."); // Set error state
+            } finally {
+                setLoading(false); // Stop loading
             }
         };
 
         fetchRequests();
-    }, []);
+    }, [bbName]); // Dependency on bbName
 
-    const handleAccept = (requestId) => {
-        // Logic to accept the request, such as making an API call to update the request status
-        console.log("Accepted request with ID:", requestId);
-        // Here you would also want to update the requests state to reflect the change
-    };
+    if (loading) {
+        return <div>Loading requests...</div>; // Loading message
+    }
 
-    const handleDecline = (requestId) => {
-        // Logic to decline the request
-        console.log("Declined request with ID:", requestId);
-        // Here you would also want to update the requests state to reflect the change
-    };
+    if (error) {
+        return <div>{error}</div>; // Display error if exists
+    }
 
     return (
-        <div>
-            <h2 className="text-xl font-semibold mb-4">Requests</h2>
+        <div className="requests-form">
+            <h2 className="text-2xl font-semibold mb-4">Requests for {bbName}</h2>
             {requests.length > 0 ? (
-                <ul className="space-y-2">
+                <div className="flex flex-col gap-4"> {/* Use flex column to stack cards vertically */}
                     {requests.map((request) => (
-                        <li key={request.id} className="p-4 border rounded shadow">
-                            <div>
-                                <p><strong>User:</strong> {request.userName}</p>
-                                <p><strong>Phone Number:</strong> {request.phoneNumber}</p>
-                                <p><strong>Requested Blood Type:</strong> {request.rBloodType}</p>
-                            </div>
-                            <div className="mt-2">
-                                <button
-                                    onClick={() => handleAccept(request.id)}
-                                    className="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700 mr-2"
-                                >
-                                    Accept
-                                </button>
-                                <button
-                                    onClick={() => handleDecline(request.id)}
-                                    className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700"
-                                >
-                                    Decline
-                                </button>
-                            </div>
-                        </li>
+                        <div
+                            key={request.id}
+                            className="bg-white shadow-md rounded-lg border border-gray-200 p-4"
+                            style={{ height: '200px' }} // Fixed height for rectangular shape
+                        >
+                            <div className="font-bold text-lg mb-2">{request.userName}</div>
+                            <div className="text-gray-700 mb-1"><strong>Phone Number:</strong> {request.phoneNumber}</div>
+                            <div className="text-gray-700 mb-1"><strong>Requested Blood Type:</strong> {request.rBloodType}</div>
+                            <div className="text-gray-700"><strong>Blood Bank Name:</strong> {request.bbName}</div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             ) : (
-                <p>No requests available.</p>
+                <div>No requests found for this blood bank.</div> // Message when no requests
             )}
         </div>
     );

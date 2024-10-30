@@ -16,6 +16,20 @@ export const getPieChartData = (bbName) => {
     return axios.get(`${API_URL}/bloodunits/piechart/${bbName}`);
 };
 
-export const getUserRequests = async () => {
-    return await axios.get(`${API_URL}/requests`); // Update the endpoint as needed
+// Updated function to get user requests using the path variable
+export const getUserRequests = async (bbName) => {
+    return await axios.get(`${API_URL}/userController/requests/${bbName}`); // Send bbName as a path parameter
 };
+
+// Updated function to get user requests using GET with query parameter
+// export const getUserRequests = async (bbName) => {
+//     return await axios.get(`${API_URL}/requests`, {
+//         params: { bbName } // Pass bbName as a query parameter
+//     });
+// };
+
+// Updated function to get user requests using GET with request body
+// export const getUserRequests = async (bbName) => {
+//     const requestBody = { bbName }; // Create request body
+//     return await axios.get(`${API_URL}/userController/requests`, { data: requestBody }); // Send the request body
+// };
