@@ -9,7 +9,7 @@ const AddBloodUnitForm = ({ onAdd }) => {
     const [expirationDate, setExpirationDate] = useState('');
     const [qrError, setQrError] = useState(null);
     const [showQrScanner, setShowQrScanner] = useState(false); // State to control QR scanner visibility
-    const [showToast, setShowToast] = useState(false); // State to control toast visibility
+    const [notification, setNotification] = useState({ message: '', type: '' }); // Notification state
 
     useEffect(() => {
         const today = new Date();
@@ -17,26 +17,37 @@ const AddBloodUnitForm = ({ onAdd }) => {
         setExpirationDate(expiry.toISOString().split('T')[0]);
     }, []);
 
-    const handleSubmit = async (bloodUnit) => { // Change to accept bloodUnit directly
+    const handleSubmit = async (bloodUnit) => {
         try {
+            console.log("Submitting blood unit:", bloodUnit); // Log the data being submitted
             const response = await addBloodUnit(bloodUnit);
             if (response.status === 200) {
-                console.log("Successfully added blood unit:", response);
+                console.log("Successfully added blood unit:", response.data); // Log the response data
                 onAdd(bloodUnit);
-                setBloodType('');
-                setBid('');
-                showSuccessToast(); // Show toast message
+                clearForm(); // Clear form fields
+                showNotification("Blood unit added successfully!", "success"); // Show success notification
+            } else if (response.status === 400) {
+                console.error("Failed to add blood unit:", response.status);
+                showNotification("Invalid submission. Please check your input.", "error"); // Show error notification
+                clearForm(); // Clear the form fields
             }
         } catch (error) {
             console.error('Error adding blood unit:', error);
+            showNotification("Invalid submission. Please check your input BID.", "error"); // Show error notification
+            clearForm(); // Clear the form fields
         }
     };
 
-    const showSuccessToast = () => {
-        setShowToast(true);
+    const showNotification = (message, type) => {
+        setNotification({ message, type });
         setTimeout(() => {
-            setShowToast(false); // Hide toast after 2 seconds
-        }, 2000);
+            setNotification({ message: '', type: '' }); // Clear notification after 3 seconds
+        }, 3000);
+    };
+
+    const clearForm = () => {
+        setBloodType('');
+        setBid('');
     };
 
     const handleScan = (data) => {
@@ -48,8 +59,8 @@ const AddBloodUnitForm = ({ onAdd }) => {
                     setBloodType(parsedData.bloodType);
                     setQrError(null);
                     setShowQrScanner(false); // Close scanner after successful scan
-                    
-                    // Directly call handleSubmit with the new blood unit data
+
+                    // Create blood unit object directly here
                     const bbName = sessionStorage.getItem('bbName');
                     const bloodUnit = {
                         bloodType: parsedData.bloodType,
@@ -75,6 +86,12 @@ const AddBloodUnitForm = ({ onAdd }) => {
 
     return (
         <div>
+            {notification.message && (
+                <div className={`p-4 mb-4 text-white rounded ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}>
+                    {notification.message}
+                </div>
+            )}
+
             <form onSubmit={(e) => {
                 e.preventDefault();
                 const bbName = sessionStorage.getItem('bbName');
@@ -135,12 +152,6 @@ const AddBloodUnitForm = ({ onAdd }) => {
                         style={{ width: '100%' }}
                     />
                     {qrError && <p className="text-red-500">{qrError}</p>}
-                </div>
-            )}
-
-            {showToast && (
-                <div className="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded shadow-md">
-                    Blood unit added successfully!
                 </div>
             )}
         </div>
