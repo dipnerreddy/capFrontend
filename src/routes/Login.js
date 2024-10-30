@@ -12,7 +12,8 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const loginApiUrl = 'http://localhost:8080/api/bloodBank/login'; // Hard-coded URL
+        // const loginApiUrl = 'http://localhost:8080/api/bloodBank/login'; // Hard-coded URL
+        const loginApiUrl = 'https://bloodlinksbn.azurewebsites.net/api/bloodBank/login'; // Hard-coded URL
 
         try {
             const response = await fetch(loginApiUrl, {
