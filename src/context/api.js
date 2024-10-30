@@ -15,3 +15,7 @@ export const addPayment = (paymentDetails) => {
 export const getPieChartData = (bbName) => {
     return axios.get(`${API_URL}/bloodunits/piechart/${bbName}`);
 };
+
+export const getUserRequests = async () => {
+    return await axios.get(`${API_URL}/requests`); // Update the endpoint as needed
+};

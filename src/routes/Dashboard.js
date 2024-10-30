@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AddBloodUnitForm from '../context/AddBloodUnitForm';
 import MakePaymentForm from '../context/MakePaymentForm';
 import CustomPieChart from '../context/PieChart';
+import RequestsForm from '../context/RequestsForm';
 import { getPieChartData } from '../context/api';
 
 const Dashboard = () => {
@@ -23,7 +24,7 @@ const Dashboard = () => {
         }
 
         try {
-            const response = await getPieChartData(bbName); // Pass bbName
+            const response = await getPieChartData(bbName);
             const data = response.data;
 
             // Format data for PieChart
@@ -38,7 +39,7 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        fetchData(); // Fetch data on component mount
+        fetchData();
     }, [bbName]);
 
     const handleLogout = () => {
@@ -48,7 +49,7 @@ const Dashboard = () => {
     };
 
     const handleRefresh = () => {
-        fetchData(); // Re-fetch data on refresh button click
+        fetchData();
     };
 
     return (
@@ -74,24 +75,41 @@ const Dashboard = () => {
             <main className="flex-1 p-6 bg-gray-200 ml-64">
                 <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-                <AddBloodUnitForm onAdd={handleAddBloodUnit} />
-                <MakePaymentForm onPay={handleMakePayment} />
+                {/* Adding Blood Unit Form */}
+                <div className="mb-6">
+                    <AddBloodUnitForm onAdd={handleAddBloodUnit} />
+                </div>
 
-                <div className="bg-white p-6 rounded shadow mt-10">
-                    <h2 className="text-2xl font-semibold mb-4">Database Info</h2>
-                    <button 
-                        onClick={handleRefresh} 
-                        className="mb-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
-                    >
-                        Refresh
-                    </button>
-                    {databaseInfo.length > 0 ? (
-                        <div>
+                {/* Making Payment Form */}
+                <div className="mb-6">
+                    <MakePaymentForm onPay={handleMakePayment} />
+                </div>
+
+                {/* Data Overview and Requests Section Side by Side */}
+                <div className="flex space-x-4 mt-10">
+                    {/* Data Overview Section */}
+                    <div className="bg-white p-6 rounded shadow w-1/2">
+                        <h2 className="text-2xl font-semibold mb-4">Data Overview</h2>
+                        <button 
+                            onClick={handleRefresh} 
+                            className="mb-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+                        >
+                            Refresh
+                        </button>
+
+                        <h3 className="text-xl font-semibold mb-4">Database Info</h3>
+                        {databaseInfo.length > 0 ? (
                             <CustomPieChart data={databaseInfo} />
-                        </div>
-                    ) : (
-                        <p>No data available. Fetch information from the database.</p>
-                    )}
+                        ) : (
+                            <p>No data available. Fetch information from the database.</p>
+                        )}
+                    </div>
+
+                    {/* Requests Section */}
+                    <div className="bg-white p-6 rounded shadow w-1/2">
+                        <h2 className="text-2xl font-semibold mb-4">Requests</h2>
+                        <RequestsForm />
+                    </div>
                 </div>
             </main>
         </div>
