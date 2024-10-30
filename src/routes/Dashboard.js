@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import AddBloodUnitForm from '../context/AddBloodUnitForm';
 import MakePaymentForm from '../context/MakePaymentForm';
 import CustomPieChart from '../context/PieChart';
@@ -17,7 +17,7 @@ const Dashboard = () => {
         console.log("Making Payment:", paymentDetails);
     };
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         if (!bbName) {
             console.error("Blood bank name is not available in session storage.");
             return;
@@ -27,7 +27,6 @@ const Dashboard = () => {
             const response = await getPieChartData(bbName);
             const data = response.data;
 
-            // Format data for PieChart
             const formattedData = Object.entries(data).map(([name, value]) => ({
                 name,
                 value,
@@ -36,11 +35,11 @@ const Dashboard = () => {
         } catch (error) {
             console.error("Error fetching pie chart data:", error);
         }
-    };
+    }, [bbName]); // Add bbName as a dependency
 
     useEffect(() => {
         fetchData(); // Call fetchData here
-    }, [bbName]); // Keep bbName as a dependency
+    }, [fetchData]); // Updated dependency array
 
     const handleLogout = () => {
         console.log("Logging out...");
@@ -75,19 +74,15 @@ const Dashboard = () => {
             <main className="flex-1 p-6 bg-gray-200 ml-64">
                 <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-                {/* Adding Blood Unit Form */}
                 <div className="mb-6">
                     <AddBloodUnitForm onAdd={handleAddBloodUnit} />
                 </div>
 
-                {/* Making Payment Form */}
                 <div className="mb-6">
                     <MakePaymentForm onPay={handleMakePayment} />
                 </div>
 
-                {/* Data Overview and Requests Section Side by Side */}
                 <div className="flex space-x-4 mt-10">
-                    {/* Data Overview Section */}
                     <div className="bg-white p-6 rounded shadow w-1/2">
                         <h2 className="text-2xl font-semibold mb-4">Data Overview</h2>
                         <button 
@@ -105,7 +100,6 @@ const Dashboard = () => {
                         )}
                     </div>
 
-                    {/* Requests Section */}
                     <div className="bg-white p-6 rounded shadow w-1/2">
                         <h2 className="text-2xl font-semibold mb-4">Requests</h2>
                         <RequestsForm />
